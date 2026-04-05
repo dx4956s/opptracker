@@ -1,0 +1,55 @@
+import { connectDB } from "@/lib/db";
+import { Job } from "@/lib/models/Job";
+import { withAuth } from "@/lib/withAuth";
+
+function serialize(doc: Record<string, unknown>) {
+  return { id: String(doc._id), ...doc, _id: undefined, __v: undefined };
+}
+
+export const GET = withAuth(async (req, { user }) => {
+  const url = new URL(req.url);
+  const type   = url.searchParams.get("type") ?? "";
+  const status = url.searchParams.get("status") ?? "";
+  const search = url.searchParams.get("search") ?? "";
+  const sort   = url.searchParams.get("sort") ?? "createdAt";
+  const order  = url.searchParams.get("order") ?? "desc";
+  const page   = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
+  const limit  = Math.min(100, Math.max(1, parseInt(url.searchParams.get("limit") ?? "20")));
+
+  await connectDB();
+
+  const query: Record<string, unknown> = { username: user.username };
+  if (type)   query.type = type;
+  if (status) query.status = status;
+  if (search) query.company = { $regex: search, $options: "i" };
+
+  const allowedSort = ["createdAt", "updatedAt", "company", "appliedOn", "startDate"];
+  const sortField = allowedSort.includes(sort) ? sort : "createdAt";
+  const sortDir = order === "asc" ? 1 : -1;
+
+  const total = await Job.countDocuments(query);
+  const docs  = await Job.find(query)
+    .sort({ [sortField]: sortDir })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean();
+
+  return Response.json({
+    data:  docs.map(serialize),
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+    limit,
+  });
+});
+
+export const POST = withAuth(async (req, { user }) => {
+  const body = await req.json();
+  if (!body.company || !body.role) {
+    return Response.json({ error: "company and role are required" }, { status: 400 });
+  }
+
+  await connectDB();
+  const doc = await Job.create({ ...body, username: user.username });
+  return Response.json({ data: serialize(doc.toObject()) }, { status: 201 });
+});

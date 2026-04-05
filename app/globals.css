@@ -1,26 +1,48 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-blue50: #E9F4FE;
+  --color-blue100: #BBDBFB;
+  --color-blue500: #258CF2;
+  --color-blue600: #227FDC;
+  --color-blue700: #1A63AC;
+  --color-yellow100: #FAEBBC;
+  --color-yellow500: #EFBF26;
+  --color-smoky2: #FCFDFD;
+  --color-smoky3: #F5F6F6;
+  --color-smoky4: #F0F1F2;
+  --color-smoky5: #D9DBDD;
+  --color-smoky6: #C0C4C7;
+  --color-smoky7: #8E949A;
+  --color-smoky8: #5B656D;
+  --color-smoky9: #47525B;
+  --color-smoky12: #172530;
+  --color-smoky13: #03121E;
+  --color-error: #FF5656;
+  --color-success: #00A79D;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-dm-sans);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #F5F6F6;
+  color: #03121E;
+}
+
+input[type="date"] {
+  position: relative;
+  color-scheme: light;
+  accent-color: var(--color-blue500);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
 }
