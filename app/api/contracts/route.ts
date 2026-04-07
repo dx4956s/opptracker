@@ -2,7 +2,7 @@ import { connectDB } from "@/lib/db";
 import { Contract } from "@/lib/models/Contract";
 import { withAuth } from "@/lib/withAuth";
 
-function serialize(doc: Record<string, unknown>) {
+function serialize<T extends { _id?: unknown; __v?: unknown }>(doc: T) {
   return { id: String(doc._id), ...doc, _id: undefined, __v: undefined };
 }
 

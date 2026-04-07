@@ -2,7 +2,7 @@ import { connectDB } from "@/lib/db";
 import { Contract } from "@/lib/models/Contract";
 import { withAuth } from "@/lib/withAuth";
 
-function serialize(doc: Record<string, unknown>) {
+function serialize<T extends { _id?: unknown; __v?: unknown }>(doc: T) {
   return { id: String(doc._id), ...doc, _id: undefined, __v: undefined };
 }
 
@@ -16,5 +16,5 @@ export const PATCH = withAuth(async (req, { params, user }) => {
     { new: true }
   ).lean();
   if (!doc) return Response.json({ error: "Not found" }, { status: 404 });
-  return Response.json({ data: serialize(doc as Record<string, unknown>) });
+  return Response.json({ data: serialize(doc) });
 });
