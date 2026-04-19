@@ -3,17 +3,23 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWRMutation from "swr/mutation";
+import { notifyRequestEnd, notifyRequestStart } from "@/lib/requestEvents";
 import { useAuthStore } from "@/store/authStore";
 
 async function loginFetcher(url: string, { arg }: { arg: { username: string; password: string } }) {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(arg),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Login failed");
-  return data;
+  notifyRequestStart();
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(arg),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Login failed");
+    return data;
+  } finally {
+    notifyRequestEnd();
+  }
 }
 
 function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
